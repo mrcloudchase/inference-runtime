@@ -32,7 +32,7 @@ impl SamplerChain {
     }
 
     /// Add a sampler to the end of the chain. Returns self for builder-style usage.
-    pub fn add(mut self, sampler: Box<dyn Sampler>) -> Self {
+    pub fn with(mut self, sampler: Box<dyn Sampler>) -> Self {
         self.samplers.push(sampler);
         self
     }

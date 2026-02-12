@@ -181,11 +181,11 @@ impl ModelArchitecture for LlamaModel {
 
                     // Weighted sum of cached values.
                     let attn_start = h * head_dim;
-                    for s in 0..seq_len {
+                    for (s, &prob) in probs.iter().enumerate().take(seq_len) {
                         let v_offset = s * kv_dim + kv_h * head_dim;
                         for d in 0..head_dim {
                             attn_output[attn_start + d] +=
-                                probs[s] * cached_v[v_offset + d];
+                                prob * cached_v[v_offset + d];
                         }
                     }
                 }

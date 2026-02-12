@@ -31,8 +31,12 @@ fn catch_panic<F: FnOnce() -> IRStatus + std::panic::UnwindSafe>(f: F) -> IRStat
 /// On success, writes a heap-allocated `IRContext` pointer into `*ctx_out`
 /// and returns `IRStatus::Ok`. The caller must later call `ir_context_destroy`
 /// to free the context.
-#[no_mangle]
-pub extern "C" fn ir_context_create(
+///
+/// # Safety
+///
+/// `ctx_out` must be a valid, non-null pointer to a `*mut IRContext`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ir_context_create(
     _backend: IRBackendType,
     ctx_out: *mut *mut IRContext,
 ) -> IRStatus {
@@ -52,12 +56,17 @@ pub extern "C" fn ir_context_create(
 /// Destroy a context previously created by `ir_context_create`.
 ///
 /// Passing a null pointer is a no-op and returns `IRStatus::Ok`.
-#[no_mangle]
+///
+/// # Safety
+///
+/// `ctx` must be a pointer returned by `ir_context_create`, or null.
+/// Must not be called twice on the same pointer.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_context_destroy(ctx: *mut IRContext) -> IRStatus {
     if ctx.is_null() {
         return IRStatus::Ok;
     }
-    drop(Box::from_raw(ctx));
+    unsafe { drop(Box::from_raw(ctx)) };
     IRStatus::Ok
 }
 
@@ -66,7 +75,12 @@ pub unsafe extern "C" fn ir_context_destroy(ctx: *mut IRContext) -> IRStatus {
 /// The model file at `model_path` is opened, parsed, and loaded into
 /// the context. Both the model weights and BPE tokenizer are extracted
 /// from the GGUF file.
-#[no_mangle]
+///
+/// # Safety
+///
+/// `ctx` must be a valid pointer from `ir_context_create`.
+/// `model_path` must be a valid null-terminated C string.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_model_load(
     ctx: *mut IRContext,
     model_path: *const c_char,
@@ -122,7 +136,13 @@ pub unsafe extern "C" fn ir_model_load(
 ///
 /// On success, writes a heap-allocated C string into `*output`.
 /// The caller must later call `ir_free_string` to free the output string.
-#[no_mangle]
+///
+/// # Safety
+///
+/// `ctx` must be a valid pointer from `ir_context_create` with a loaded model.
+/// `prompt` must be a valid null-terminated C string.
+/// `output` must be a valid, non-null pointer to a `*mut c_char`.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_generate(
     ctx: *mut IRContext,
     prompt: *const c_char,
@@ -156,18 +176,18 @@ pub unsafe extern "C" fn ir_generate(
 
         // Build the sampler chain.
         let chain = ir_sampler::SamplerChain::new()
-            .add(Box::new(ir_sampler::RepetitionPenaltySampler::new(
+            .with(Box::new(ir_sampler::RepetitionPenaltySampler::new(
                 params.repetition_penalty,
                 64,
             )))
-            .add(Box::new(ir_sampler::TemperatureSampler::new(
+            .with(Box::new(ir_sampler::TemperatureSampler::new(
                 params.temperature,
             )))
-            .add(Box::new(ir_sampler::TopKSampler::new(
+            .with(Box::new(ir_sampler::TopKSampler::new(
                 params.top_k as usize,
             )))
-            .add(Box::new(ir_sampler::TopPSampler::new(params.top_p)))
-            .add(Box::new(ir_sampler::GreedySampler));
+            .with(Box::new(ir_sampler::TopPSampler::new(params.top_p)))
+            .with(Box::new(ir_sampler::GreedySampler));
 
         // Generate tokens autoregressively.
         let mut generated = Vec::new();
@@ -237,7 +257,13 @@ pub unsafe extern "C" fn ir_generate(
 ///
 /// Each generated token is passed to the `callback` function as a C string.
 /// The callback should return `true` to continue generation, or `false` to stop.
-#[no_mangle]
+///
+/// # Safety
+///
+/// `ctx` must be a valid pointer from `ir_context_create` with a loaded model.
+/// `prompt` must be a valid null-terminated C string.
+/// `callback` and `user_data` must remain valid for the duration of generation.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_generate_streaming(
     ctx: *mut IRContext,
     prompt: *const c_char,
@@ -269,14 +295,14 @@ pub unsafe extern "C" fn ir_generate_streaming(
 
         let tokens = tokenizer.encode(prompt_str);
         let chain = ir_sampler::SamplerChain::new()
-            .add(Box::new(ir_sampler::TemperatureSampler::new(
+            .with(Box::new(ir_sampler::TemperatureSampler::new(
                 params.temperature,
             )))
-            .add(Box::new(ir_sampler::TopKSampler::new(
+            .with(Box::new(ir_sampler::TopKSampler::new(
                 params.top_k as usize,
             )))
-            .add(Box::new(ir_sampler::TopPSampler::new(params.top_p)))
-            .add(Box::new(ir_sampler::GreedySampler));
+            .with(Box::new(ir_sampler::TopPSampler::new(params.top_p)))
+            .with(Box::new(ir_sampler::GreedySampler));
 
         let backend = ctx.backend.as_ref();
 
@@ -327,12 +353,16 @@ pub unsafe extern "C" fn ir_generate_streaming(
 }
 
 /// Reset the model's KV cache (e.g. to start a new conversation).
-#[no_mangle]
+///
+/// # Safety
+///
+/// `ctx` must be a valid pointer from `ir_context_create`, or null.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_reset(ctx: *mut IRContext) -> IRStatus {
     if ctx.is_null() {
         return IRStatus::ErrorInvalidArgument;
     }
-    let ctx = &mut *ctx;
+    let ctx = unsafe { &mut *ctx };
     if let Some(model) = ctx.model.as_mut() {
         model.reset_cache();
     }
@@ -344,7 +374,7 @@ pub unsafe extern "C" fn ir_reset(ctx: *mut IRContext) -> IRStatus {
 /// Returns a pointer to a C string describing the most recent error, or
 /// null if no error has occurred. The caller must free the returned string
 /// with `ir_free_string`.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn ir_last_error() -> *const c_char {
     match error::take_last_error() {
         Some(e) => e.into_raw(),
@@ -353,9 +383,14 @@ pub extern "C" fn ir_last_error() -> *const c_char {
 }
 
 /// Free a string previously returned by `ir_generate` or `ir_last_error`.
-#[no_mangle]
+///
+/// # Safety
+///
+/// `s` must be a pointer returned by `ir_generate`, `ir_last_error`, or null.
+/// Must not be called twice on the same pointer.
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn ir_free_string(s: *mut c_char) {
     if !s.is_null() {
-        drop(CString::from_raw(s));
+        unsafe { drop(CString::from_raw(s)) };
     }
 }

@@ -11,14 +11,6 @@
 #include <stdlib.h>
 
 /**
- * Compute backend type selector.
- */
-typedef enum {
-    IR_BACKEND_TYPE_CPU = 0,
-    IR_BACKEND_TYPE_METAL = 1,
-} IRBackendType;
-
-/**
  * Status codes returned by all FFI functions.
  */
 typedef enum {
@@ -29,6 +21,14 @@ typedef enum {
     IR_STATUS_ERROR_OUT_OF_MEMORY = 4,
     IR_STATUS_ERROR_INTERNAL = 5,
 } IRStatus;
+
+/**
+ * Compute backend type selector.
+ */
+typedef enum {
+    IR_BACKEND_TYPE_CPU = 0,
+    IR_BACKEND_TYPE_METAL = 1,
+} IRBackendType;
 
 /**
  * Opaque context handle that owns the backend, model, and tokenizer.
@@ -59,6 +59,10 @@ typedef bool (*IRStreamCallback)(const char *token, void *user_data);
  * On success, writes a heap-allocated `IRContext` pointer into `*ctx_out`
  * and returns `IRStatus::Ok`. The caller must later call `ir_context_destroy`
  * to free the context.
+ *
+ * # Safety
+ *
+ * `ctx_out` must be a valid, non-null pointer to a `*mut IRContext`.
  */
 IRStatus ir_context_create(IRBackendType _backend, IRContext **ctx_out);
 
@@ -66,6 +70,11 @@ IRStatus ir_context_create(IRBackendType _backend, IRContext **ctx_out);
  * Destroy a context previously created by `ir_context_create`.
  *
  * Passing a null pointer is a no-op and returns `IRStatus::Ok`.
+ *
+ * # Safety
+ *
+ * `ctx` must be a pointer returned by `ir_context_create`, or null.
+ * Must not be called twice on the same pointer.
  */
 IRStatus ir_context_destroy(IRContext *ctx);
 
@@ -75,6 +84,11 @@ IRStatus ir_context_destroy(IRContext *ctx);
  * The model file at `model_path` is opened, parsed, and loaded into
  * the context. Both the model weights and BPE tokenizer are extracted
  * from the GGUF file.
+ *
+ * # Safety
+ *
+ * `ctx` must be a valid pointer from `ir_context_create`.
+ * `model_path` must be a valid null-terminated C string.
  */
 IRStatus ir_model_load(IRContext *ctx, const char *model_path);
 
@@ -83,6 +97,12 @@ IRStatus ir_model_load(IRContext *ctx, const char *model_path);
  *
  * On success, writes a heap-allocated C string into `*output`.
  * The caller must later call `ir_free_string` to free the output string.
+ *
+ * # Safety
+ *
+ * `ctx` must be a valid pointer from `ir_context_create` with a loaded model.
+ * `prompt` must be a valid null-terminated C string.
+ * `output` must be a valid, non-null pointer to a `*mut c_char`.
  */
 IRStatus ir_generate(IRContext *ctx, const char *prompt, IRGenerateParams params, char **output);
 
@@ -91,6 +111,12 @@ IRStatus ir_generate(IRContext *ctx, const char *prompt, IRGenerateParams params
  *
  * Each generated token is passed to the `callback` function as a C string.
  * The callback should return `true` to continue generation, or `false` to stop.
+ *
+ * # Safety
+ *
+ * `ctx` must be a valid pointer from `ir_context_create` with a loaded model.
+ * `prompt` must be a valid null-terminated C string.
+ * `callback` and `user_data` must remain valid for the duration of generation.
  */
 IRStatus ir_generate_streaming(IRContext *ctx,
                                const char *prompt,
@@ -100,6 +126,10 @@ IRStatus ir_generate_streaming(IRContext *ctx,
 
 /**
  * Reset the model's KV cache (e.g. to start a new conversation).
+ *
+ * # Safety
+ *
+ * `ctx` must be a valid pointer from `ir_context_create`, or null.
  */
 IRStatus ir_reset(IRContext *ctx);
 
@@ -114,6 +144,11 @@ const char *ir_last_error(void);
 
 /**
  * Free a string previously returned by `ir_generate` or `ir_last_error`.
+ *
+ * # Safety
+ *
+ * `s` must be a pointer returned by `ir_generate`, `ir_last_error`, or null.
+ * Must not be called twice on the same pointer.
  */
 void ir_free_string(char *s);
 

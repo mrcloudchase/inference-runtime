@@ -1,6 +1,7 @@
 use crate::sampler::{Sampler, TokenLogit};
 use rand::rngs::StdRng;
-use rand::distributions::{Distribution, WeightedIndex};
+use rand::distr::weighted::WeightedIndex;
+use rand::distr::Distribution;
 use rand::SeedableRng;
 
 /// Greedy sampler: selects the single token with the highest logit.

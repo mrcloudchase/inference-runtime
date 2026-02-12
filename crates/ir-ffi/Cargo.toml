@@ -15,4 +15,4 @@ ir-model = { path = "../ir-model" }
 ir-sampler = { path = "../ir-sampler" }
 
 [build-dependencies]
-cbindgen = "0.27"
+cbindgen = "0.29"
