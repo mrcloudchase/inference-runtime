@@ -1,4 +1,4 @@
-.PHONY: all rust go clean test
+.PHONY: all rust go clean test fmt check
 
 all: rust go
 

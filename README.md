@@ -25,7 +25,7 @@ A custom LLM inference runtime built from scratch in Rust and Go. The Rust engin
 ## Requirements
 
 - Rust 1.70+ (with `cargo`)
-- Go 1.19+
+- Go 1.22+
 - macOS / Apple Silicon (arm64)
 
 ## Build
