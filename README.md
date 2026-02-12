@@ -188,6 +188,17 @@ make check    # runs cargo clippy
 make fmt      # formats Rust + Go code
 ```
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the full development plan. Current status:
+
+- **Phase 1** — CPU inference end-to-end (complete)
+- **Phase 2** — Metal GPU acceleration
+- **Phase 3** — Performance optimization (SIMD, quantized compute)
+- **Phase 4** — Additional architectures (Mistral, Phi, Gemma)
+- **Phase 5** — Model management (HuggingFace downloads)
+- **Phase 6** — Production features (OpenAI-compatible API, CUDA, Docker)
+
 ## License
 
 MIT

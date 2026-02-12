@@ -1,4 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
+
+Always reference [ROADMAP.md](./ROADMAP.md) when planning or implementing new features to understand project phases, priorities, and what has already been completed.
 
 ## Build
 
