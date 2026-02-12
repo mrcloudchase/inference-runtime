@@ -1,0 +1,12 @@
+[package]
+name = "ir-sampler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Token sampling strategies for inference-runtime"
+
+[dependencies]
+rand = "0.8"
+
+[dev-dependencies]
+approx = "0.5"

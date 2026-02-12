@@ -1,0 +1,22 @@
+[package]
+name = "ir-tensor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tensor library with pluggable compute backends for inference-runtime"
+
+[features]
+default = []
+metal = ["objc2", "objc2-metal", "objc2-foundation"]
+
+[dependencies]
+thiserror = "2"
+half = "2"
+
+# Metal dependencies (macOS only)
+objc2 = { version = "0.6", optional = true }
+objc2-metal = { version = "0.3", optional = true, features = ["MTLDevice", "MTLCommandQueue", "MTLBuffer", "MTLLibrary", "MTLComputePipeline", "MTLCommandBuffer"] }
+objc2-foundation = { version = "0.3", optional = true }
+
+[dev-dependencies]
+approx = "0.5"

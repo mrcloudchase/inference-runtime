@@ -1,0 +1,18 @@
+[package]
+name = "ir-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "C FFI boundary for inference-runtime"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+ir-tensor = { path = "../ir-tensor" }
+ir-model = { path = "../ir-model" }
+ir-sampler = { path = "../ir-sampler" }
+
+[build-dependencies]
+cbindgen = "0.27"

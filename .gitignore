@@ -1,0 +1,7 @@
+/target/
+/models/*.gguf
+*.o
+*.a
+*.dylib
+*.so
+go-wrapper/ir
