@@ -1,5 +1,20 @@
 # inference-runtime
 
+[![GitHub stars](https://img.shields.io/github/stars/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/issues)
+[![GitHub license](https://img.shields.io/github/license/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/blob/main/LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/commits/main)
+[![Repo size](https://img.shields.io/github/repo-size/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime)
+[![Top language](https://img.shields.io/github/languages/top/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime)
+[![Contributors](https://img.shields.io/github/contributors/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/graphs/contributors)
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)](https://www.rust-lang.org/)
+[![Go](https://img.shields.io/badge/go-1.22%2B-00ADD8)](https://go.dev/)
+[![Platform](https://img.shields.io/badge/platform-macOS%20Apple%20Silicon-lightgrey)](https://github.com/mrcloudchase/inference-runtime)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/mrcloudchase/inference-runtime/pulls)
+[![Built from scratch](https://img.shields.io/badge/built-from%20scratch-ff69b4)](https://github.com/mrcloudchase/inference-runtime)
+[![Lines of code](https://img.shields.io/tokei/lines/github/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime)
+
 A custom LLM inference runtime built from scratch in Rust and Go. The Rust engine handles tensor operations, GGUF model loading, and the transformer forward pass. The Go wrapper provides a CLI and REST API.
 
 ```
