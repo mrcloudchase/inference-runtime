@@ -2,7 +2,7 @@
 
 [![Stars](https://img.shields.io/github/stars/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/stargazers)
 [![Forks](https://img.shields.io/github/forks/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/network/members)
-[![License: MIT](https://img.shields.io/github/license/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mrcloudchase/inference-runtime/blob/main/LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime/commits/main)
 [![Top language](https://img.shields.io/github/languages/top/mrcloudchase/inference-runtime)](https://github.com/mrcloudchase/inference-runtime)
 
